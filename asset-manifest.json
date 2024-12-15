@@ -1,16 +1,17 @@
 {
   "files": {
-    "main.css": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.f855e6bc.css",
-    "main.js": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.3575beff.js",
+    "main.css": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.49faa5e3.css",
+    "main.js": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.1b9680b7.js",
     "static/js/488.795a4a82.chunk.js": "/JanManikowski/mjmKlussenbedrijf.git/static/js/488.795a4a82.chunk.js",
-    "static/media/logo.svg": "/JanManikowski/mjmKlussenbedrijf.git/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "static/media/main.jpg": "/JanManikowski/mjmKlussenbedrijf.git/static/media/main.40aedcc1604e29e5fbea.jpg",
+    "static/media/me.jpeg": "/JanManikowski/mjmKlussenbedrijf.git/static/media/me.971bad3a6a95ff7da99b.jpeg",
     "index.html": "/JanManikowski/mjmKlussenbedrijf.git/index.html",
-    "main.f855e6bc.css.map": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.f855e6bc.css.map",
-    "main.3575beff.js.map": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.3575beff.js.map",
+    "main.49faa5e3.css.map": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.49faa5e3.css.map",
+    "main.1b9680b7.js.map": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.1b9680b7.js.map",
     "488.795a4a82.chunk.js.map": "/JanManikowski/mjmKlussenbedrijf.git/static/js/488.795a4a82.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.f855e6bc.css",
-    "static/js/main.3575beff.js"
+    "static/css/main.49faa5e3.css",
+    "static/js/main.1b9680b7.js"
   ]
 }
