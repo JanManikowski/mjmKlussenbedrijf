@@ -1,6 +1,7 @@
 import React from "react";
 import AboutMeCard from "../components/AboutMeCard";
 import backgroundImage from "../assets/main.jpg";
+import CategoryGallery from "../components/CategoryGallery";
 
 const Home = () => {
   return (
@@ -36,6 +37,26 @@ const Home = () => {
         }}
       >
         <AboutMeCard />
+      </div>
+
+      <div
+        style={{
+          backgroundColor: "#0A060D",
+          padding: "50px 20px",
+        }}
+      >
+        <h2
+          className="text-center"
+          style={{
+            fontFamily: "Roboto, sans-serif",
+            fontSize: "2.5rem",
+            color: "white",
+            marginBottom: "30px",
+          }}
+        >
+          Featured Images
+        </h2>
+        <CategoryGallery />
       </div>
     </div>
   );

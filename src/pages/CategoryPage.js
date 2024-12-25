@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { collection, query, where, getDocs, addDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase";
 
@@ -9,6 +16,7 @@ const CategoryPage = () => {
   const [images, setImages] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -26,13 +34,10 @@ const CategoryPage = () => {
           where("categoryId", "==", categoryId)
         );
         const imageSnapshot = await getDocs(imageQuery);
-        const imagesData = imageSnapshot.docs.map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-          };
-        });
+        const imagesData = imageSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
 
         setImages(imagesData);
       } catch (error) {
@@ -41,6 +46,10 @@ const CategoryPage = () => {
     };
 
     fetchCategoryData();
+
+    // Check login status (use actual logic for authentication)
+    const adminStatus = localStorage.getItem("isAdmin") === "true";
+    setIsLoggedIn(adminStatus);
   }, [categoryId]);
 
   const handleFilesUpload = async (files) => {
@@ -57,7 +66,8 @@ const CategoryPage = () => {
         const reader = new FileReader();
         reader.onload = (e) => {
           image.src = e.target.result;
-          image.onload = () => resolve({ width: image.width, height: image.height });
+          image.onload = () =>
+            resolve({ width: image.width, height: image.height });
         };
         reader.onerror = reject;
         reader.readAsDataURL(file);
@@ -104,21 +114,45 @@ const CategoryPage = () => {
   };
 
   return (
-    <div className="container text-white" style={{ padding: "40px 0" }}>
-      <h1 className="text-center mb-5">{categoryName} Images</h1>
+    <div
+      className="container-fluid text-white mt-5"
+      style={{
+        backgroundColor: "#0A060D", // Matches the dark theme
+        minHeight: "100vh",
+        paddingTop: "40px",
+      }}
+    >
+      <h1
+        className="text-center mb-5"
+        style={{ fontSize: "2.5rem", fontWeight: "bold" }}
+      >
+        {categoryName} Images
+      </h1>
 
-      <div className="mb-4 text-center">
-        <label htmlFor="fileInput" className="form-label">
-          Upload Images
-        </label>
-        <input
-          type="file"
-          id="fileInput"
-          className="form-control mb-3 w-50 mx-auto"
-          multiple
-          onChange={(e) => handleFilesUpload(e.target.files)}
-        />
-      </div>
+      {isLoggedIn && ( // Show upload section only if logged in
+        <div className="mb-4 text-center">
+          <label htmlFor="fileInput" className="form-label">
+            <strong>Upload Images</strong>
+          </label>
+          <input
+            type="file"
+            id="fileInput"
+            className="form-control w-50 mx-auto"
+            multiple
+            onChange={(e) => handleFilesUpload(e.target.files)}
+            style={{
+              backgroundColor: "#1a1a1a", // Dark background for input
+              color: "#f1f1f1",
+              border: "1px solid #555",
+            }}
+          />
+          {isUploading && (
+            <p className="text-warning mt-3">
+              Uploading images... Please wait.
+            </p>
+          )}
+        </div>
+      )}
 
       <div
         className="gallery-container"
@@ -127,6 +161,7 @@ const CategoryPage = () => {
           gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
           gap: "10px", // Space between images
           gridAutoFlow: "dense", // Fill vertical gaps
+          padding: "2rem",
         }}
       >
         {images.map((image) => (
@@ -136,7 +171,10 @@ const CategoryPage = () => {
               position: "relative",
               overflow: "hidden",
               borderRadius: "10px",
-              gridRowEnd: `span ${Math.ceil((image.height / image.width) * 2)}`, // Adjust row span for taller images
+              gridRowEnd: `span ${Math.ceil(
+                (image.height / image.width) * 2
+              )}`, // Adjust row span for taller images
+              border: "2px solid #333", // Subtle border for images
             }}
           >
             <img
