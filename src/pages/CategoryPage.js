@@ -159,8 +159,8 @@ const CategoryPage = () => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
-          gap: "10px", // Space between images
-          gridAutoFlow: "dense", // Fill vertical gaps
+          gap: "10px", 
+          gridAutoFlow: "dense", 
           padding: "2rem",
         }}
       >
