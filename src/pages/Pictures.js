@@ -9,6 +9,9 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
+import AddCategoryModal from "../components/AddCategoryModal";
+import EditCategoryModal from "../components/EditCategoryModal";
+import CategoryCard from "../components/CategoryCard";
 
 const Pictures = () => {
   const [categories, setCategories] = useState([]);
@@ -49,7 +52,10 @@ const Pictures = () => {
   };
 
   const handleEditCategory = async (id) => {
-    const updatedCategory = { name: editingCategory.name, image: editingCategory.image };
+    const updatedCategory = {
+      name: editingCategory.name,
+      image: editingCategory.image,
+    };
     await updateDoc(doc(db, "categories", id), updatedCategory);
 
     alert("Category updated!");
@@ -68,11 +74,11 @@ const Pictures = () => {
 
   return (
     <div
-      className="container-fluid text-white"
+      className="container-fluid text-white mt-5"
       style={{
-        backgroundColor: "#0A060D", // Background color
-        padding: "40px 0",
+        backgroundColor: "#0A060D",
         minHeight: "100vh",
+        paddingTop: "50px",
       }}
     >
       <h1 className="text-center mb-5" style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
@@ -93,204 +99,29 @@ const Pictures = () => {
 
       <div className="row">
         {categories.map((category) => (
-          <div
-            className="col-12 col-md-6 col-lg-4 mb-4"
+          <CategoryCard
             key={category.id}
-            onClick={() => handleCategoryClick(category.id)}
-            style={{ cursor: "pointer" }}
-          >
-            <div
-              className="card bg-dark text-white shadow"
-              style={{ borderRadius: "15px", overflow: "hidden" }}
-            >
-              <img
-                src={category.image}
-                alt={category.name}
-                className="card-img"
-                style={{ objectFit: "cover", height: "200px" }}
-              />
-              <div className="card-img-overlay d-flex justify-content-between align-items-end p-3">
-                <h5 className="card-title bg-black bg-opacity-75 px-2 py-1 rounded">
-                  {category.name}
-                </h5>
-                {isAdmin && (
-                  <div>
-                    <button
-                      className="btn btn-warning btn-sm me-2"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setEditingCategory(category);
-                      }}
-                      data-bs-toggle="modal"
-                      data-bs-target="#editModal"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteCategory(category.id);
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+            category={category}
+            isAdmin={isAdmin}
+            onEdit={() => setEditingCategory(category)}
+            onDelete={handleDeleteCategory}
+            onClick={handleCategoryClick}
+          />
         ))}
       </div>
 
-      {/* Add Category Modal */}
-      <div
-        className="modal fade"
-        id="categoryModal"
-        tabIndex="-1"
-        aria-labelledby="categoryModalLabel"
-        aria-hidden="true"
-      >
-        <div className="modal-dialog">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h5 className="modal-title" id="categoryModalLabel">
-                Add New Category
-              </h5>
-              <button
-                type="button"
-                className="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div className="modal-body">
-              <div className="mb-3">
-                <label htmlFor="categoryName" className="form-label">
-                  Category Name
-                </label>
-                <input
-                  type="text"
-                  id="categoryName"
-                  className="form-control"
-                  value={newCategory.name}
-                  onChange={(e) =>
-                    setNewCategory({ ...newCategory, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="categoryImage" className="form-label">
-                  Category Image URL
-                </label>
-                <input
-                  type="text"
-                  id="categoryImage"
-                  className="form-control"
-                  value={newCategory.image}
-                  onChange={(e) =>
-                    setNewCategory({ ...newCategory, image: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-            <div className="modal-footer">
-              <button
-                type="button"
-                className="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Close
-              </button>
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={handleAddCategory}
-              >
-                Add Category
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AddCategoryModal
+        newCategory={newCategory}
+        setNewCategory={setNewCategory}
+        onAddCategory={handleAddCategory}
+      />
 
-      {/* Edit Category Modal */}
       {editingCategory && (
-        <div
-          className="modal fade"
-          id="editModal"
-          tabIndex="-1"
-          aria-labelledby="editModalLabel"
-          aria-hidden="true"
-        >
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title" id="editModalLabel">
-                  Edit Category
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                ></button>
-              </div>
-              <div className="modal-body">
-                <div className="mb-3">
-                  <label htmlFor="editCategoryName" className="form-label">
-                    Category Name
-                  </label>
-                  <input
-                    type="text"
-                    id="editCategoryName"
-                    className="form-control"
-                    value={editingCategory.name}
-                    onChange={(e) =>
-                      setEditingCategory({
-                        ...editingCategory,
-                        name: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-                <div className="mb-3">
-                  <label htmlFor="editCategoryImage" className="form-label">
-                    Category Image URL
-                  </label>
-                  <input
-                    type="text"
-                    id="editCategoryImage"
-                    className="form-control"
-                    value={editingCategory.image}
-                    onChange={(e) =>
-                      setEditingCategory({
-                        ...editingCategory,
-                        image: e.target.value,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  data-bs-dismiss="modal"
-                >
-                  Close
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-warning"
-                  onClick={() => handleEditCategory(editingCategory.id)}
-                >
-                  Save Changes
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <EditCategoryModal
+          editingCategory={editingCategory}
+          setEditingCategory={setEditingCategory}
+          onEditCategory={handleEditCategory}
+        />
       )}
     </div>
   );
