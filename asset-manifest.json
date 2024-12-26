@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.49faa5e3.css",
+    "main.js": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.941465cb.js",
+    "static/js/488.795a4a82.chunk.js": "/JanManikowski/mjmKlussenbedrijf.git/static/js/488.795a4a82.chunk.js",
+    "static/media/main.jpg": "/JanManikowski/mjmKlussenbedrijf.git/static/media/main.40aedcc1604e29e5fbea.jpg",
+    "static/media/me.jpeg": "/JanManikowski/mjmKlussenbedrijf.git/static/media/me.971bad3a6a95ff7da99b.jpeg",
+    "index.html": "/JanManikowski/mjmKlussenbedrijf.git/index.html",
+    "main.49faa5e3.css.map": "/JanManikowski/mjmKlussenbedrijf.git/static/css/main.49faa5e3.css.map",
+    "main.941465cb.js.map": "/JanManikowski/mjmKlussenbedrijf.git/static/js/main.941465cb.js.map",
+    "488.795a4a82.chunk.js.map": "/JanManikowski/mjmKlussenbedrijf.git/static/js/488.795a4a82.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.49faa5e3.css",
+    "static/js/main.941465cb.js"
+  ]
+}
