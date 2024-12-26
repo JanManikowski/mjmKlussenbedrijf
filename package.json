@@ -1,8 +1,8 @@
 {
-  "name": "mjmklussenbedrijf",
+  "name": "mjmKlussenbedrijf",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://github.com/JanManikowski/mjmKlussenbedrijf.git",
+  "homepage": "https://janmanikowski.github.io/mjmKlussenbedrijf/",
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
     "bootstrap": "^5.3.3",
