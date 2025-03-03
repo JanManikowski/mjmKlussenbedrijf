@@ -3,6 +3,7 @@ import meImage from "../assets/me.jpeg"; // Import the image
 
 const AboutMeCard = () => {
   return (
+    
     <div
       className="d-flex flex-column flex-md-row align-items-center justify-content-center"
       style={{
@@ -15,6 +16,7 @@ const AboutMeCard = () => {
         color: "white",
       }}
     >
+      
       {/* Image Section */}
       <div
         style={{

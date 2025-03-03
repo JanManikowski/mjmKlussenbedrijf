@@ -12,6 +12,8 @@ import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap CSS globally
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import './styles/global.css'
+import './styles/responsive.css';
 
 const App = () => {
   return (

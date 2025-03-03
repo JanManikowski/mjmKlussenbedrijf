@@ -1,32 +1,54 @@
 import React, { useState } from "react";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// If using toastify for immediate feedback:
+import { toast } from "react-toastify";
 
-const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
+const AddCategoryModal = ({ onAddCategory }) => {
+  const [categoryName, setCategoryName] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     setSelectedFile(file);
+    if (file) {
+      // Show a quick preview
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
-  const handleUpload = async () => {
-    if (!selectedFile) {
-      alert("Please select an image to upload.");
+  const handleSubmit = async () => {
+    // Make sure both name and file are set
+    if (!categoryName.trim() || !selectedFile) {
+      // If using toastify
+      toast.error("Please provide both a name and select an image.");
       return;
     }
 
     setUploading(true);
+
     try {
+      // 1) Upload the file to Firebase Storage
       const storage = getStorage();
       const storageRef = ref(storage, `categories/${selectedFile.name}`);
       await uploadBytes(storageRef, selectedFile);
       const downloadURL = await getDownloadURL(storageRef);
-      setNewCategory({ ...newCategory, image: downloadURL });
-      alert("Image uploaded successfully!");
+
+      // 2) Call the parent's onAddCategory with name + the new image URL
+      await onAddCategory({ name: categoryName, image: downloadURL });
+
+      // 3) Clear local state (optional)
+      setCategoryName("");
+      setSelectedFile(null);
+      setPreviewUrl("");
+
+      // If using toastify, you can also show success here,
+      // but it might be redundant if the parent also shows a toast.
+      // toast.success("Category added successfully!");
     } catch (error) {
-      console.error("Error uploading image:", error);
-      alert("Failed to upload the image. Please try again.");
+      console.error("Error uploading category image:", error);
+      toast.error("Failed to add category. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -43,10 +65,7 @@ const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
       <div className="modal-dialog">
         <div
           className="modal-content"
-          style={{
-            backgroundColor: "#1a1a1a",
-            color: "#f1f1f1",
-          }}
+          style={{ backgroundColor: "#1a1a1a", color: "#f1f1f1" }}
         >
           <div className="modal-header">
             <h5 className="modal-title" id="categoryModalLabel">
@@ -60,7 +79,9 @@ const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
               aria-label="Close"
             ></button>
           </div>
+
           <div className="modal-body">
+            {/* Category Name */}
             <div className="mb-3">
               <label htmlFor="categoryName" className="form-label">
                 Category Name
@@ -74,12 +95,12 @@ const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
                   color: "#fff",
                   border: "1px solid #555",
                 }}
-                value={newCategory.name}
-                onChange={(e) =>
-                  setNewCategory({ ...newCategory, name: e.target.value })
-                }
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
               />
             </div>
+
+            {/* File Input */}
             <div className="mb-3">
               <label htmlFor="categoryImage" className="form-label">
                 Upload Image
@@ -95,32 +116,25 @@ const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
                 }}
                 onChange={handleFileChange}
               />
-              {selectedFile && (
-                <button
-                  type="button"
-                  className="btn btn-secondary mt-2"
-                  onClick={handleUpload}
-                  disabled={uploading}
-                >
-                  {uploading ? "Uploading..." : "Upload Image"}
-                </button>
+
+              {/* Preview if user selected a file */}
+              {previewUrl && (
+                <div className="text-center mt-3">
+                  <img
+                    src={previewUrl}
+                    alt="Preview"
+                    style={{
+                      maxWidth: "100%",
+                      height: "150px",
+                      objectFit: "cover",
+                      borderRadius: "10px",
+                    }}
+                  />
+                </div>
               )}
             </div>
-            {newCategory.image && (
-              <div className="text-center mt-3">
-                <img
-                  src={newCategory.image}
-                  alt="Uploaded Preview"
-                  style={{
-                    maxWidth: "100%",
-                    height: "150px",
-                    objectFit: "cover",
-                    borderRadius: "10px",
-                  }}
-                />
-              </div>
-            )}
           </div>
+
           <div className="modal-footer">
             <button
               type="button"
@@ -142,10 +156,10 @@ const AddCategoryModal = ({ newCategory, setNewCategory, onAddCategory }) => {
                 color: "#fff",
                 border: "none",
               }}
-              onClick={onAddCategory}
-              disabled={!newCategory.image || uploading}
+              onClick={handleSubmit}
+              disabled={uploading}
             >
-              Add Category
+              {uploading ? "Uploading..." : "Add Category"}
             </button>
           </div>
         </div>

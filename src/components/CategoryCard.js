@@ -1,6 +1,7 @@
 import React from "react";
 
 const CategoryCard = ({ category, isAdmin, onEdit, onDelete, onClick }) => (
+
   <div
     className="col-12 col-md-6 col-lg-4 mb-4"
     style={{ cursor: "pointer" }}
@@ -8,15 +9,41 @@ const CategoryCard = ({ category, isAdmin, onEdit, onDelete, onClick }) => (
   >
     <div
       className="card bg-dark text-white shadow"
-      style={{ borderRadius: "15px", overflow: "hidden" }}
+      style={{
+        position: "relative",
+        borderRadius: "15px",
+        overflow: "hidden",
+        aspectRatio: "1 / 1", // Forces the card to be a square
+      }}
     >
+      {/* 
+        Instead of .card-img, we manually set width/height to fill the square.
+        objectFit: "cover" keeps the image cropped without distortion.
+      */}
       <img
         src={category.image}
         alt={category.name}
-        className="card-img"
-        style={{ objectFit: "cover", height: "200px" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          display: "block",
+        }}
       />
-      <div className="card-img-overlay d-flex justify-content-between align-items-end p-3">
+      
+      {/* 
+        Absolutely-positioned overlay to show title & buttons at the bottom.
+      */}
+      <div
+        className="card-img-overlay d-flex justify-content-between align-items-end p-3"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        }}
+      >
         <h5 className="card-title bg-black bg-opacity-75 px-2 py-1 rounded">
           {category.name}
         </h5>

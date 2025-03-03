@@ -16,16 +16,8 @@ const Home = () => {
           color: "white",
         }}
       >
-        <h1
-          style={{
-            fontFamily: "Roboto, sans-serif",
-            fontSize: "4rem",
-            fontWeight: "bold",
-            textShadow: "2px 2px 5px rgba(0, 0, 0, 0.8)",
-          }}
-        >
-          MJMklussenbedrijf
-        </h1>
+        <h1 className="home-title">MJMklussenbedrijf</h1>
+
       </div>
 
       <div

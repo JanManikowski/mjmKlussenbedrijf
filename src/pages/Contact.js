@@ -60,6 +60,7 @@ const Contact = () => {
           fontSize: "2.5rem",
           fontWeight: "bold",
           marginBottom: "30px",
+          paddingTop: "1.5rem"
         }}
       >
         Contact Us

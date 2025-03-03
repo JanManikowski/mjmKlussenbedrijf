@@ -108,17 +108,7 @@ const CategoryGallery = () => {
   }
 
   return (
-    <div
-      className="gallery-container"
-      style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
-        gap: "10px",
-        gridAutoFlow: "dense",
-        padding: "20px",
-        backgroundColor: "#0A060D",
-      }}
-    >
+    <div className="gallery-container">
       {images.map((image) => (
         <div
           key={image.id}

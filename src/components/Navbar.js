@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "../styles/responsive.css";
+
 
 const NavBar = () => {
   const [navbarStyle, setNavbarStyle] = useState({
@@ -10,7 +12,7 @@ const NavBar = () => {
   });
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false); // Track admin login status
+  const [isAdmin, setIsAdmin] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -43,163 +45,97 @@ const NavBar = () => {
 
     updateNavbarStyle();
     window.addEventListener("scroll", updateNavbarStyle);
-
     return () => {
       window.removeEventListener("scroll", updateNavbarStyle);
     };
   }, [location.pathname]);
 
   useEffect(() => {
-    // Check admin status on component mount
-    const adminStatus = localStorage.getItem("isAdmin") === "true"; // Use isAdmin as the key
+    const adminStatus = localStorage.getItem("isAdmin") === "true";
     setIsAdmin(adminStatus);
   }, []);
 
   const handleMenuClick = () => {
-    setMenuOpen(!menuOpen);
+    setMenuOpen((prev) => !prev);
+    document.body.classList.toggle("menu-open", !menuOpen); // Helps prevent flicker
   };
+  
 
   const handleLinkClick = () => {
-    setMenuOpen(false); // Close the menu explicitly
+    setMenuOpen(false);
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isAdmin"); // Remove admin status
+    localStorage.removeItem("isAdmin");
     setIsAdmin(false);
-    window.location.reload(); // Refresh the page after logout
+    window.location.reload();
   };
 
   return (
-    <>
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          backgroundColor: "rgba(0, 0, 0, 0.7)",
-          zIndex: 998,
-          visibility: menuOpen ? "visible" : "hidden",
-          opacity: menuOpen ? 1 : 0,
-          backdropFilter: menuOpen ? "blur(4px)" : "none",
-          transition: "opacity 0.3s ease, visibility 0.3s ease",
-        }}
-        onClick={handleLinkClick}
-      ></div>
-
-<nav
-  className="navbar navbar-expand-lg navbar-dark fixed-top"
-  style={{
-    ...navbarStyle,
-    height: "80px", // Adjusted height for the navbar
-    display: "flex",
-    alignItems: "center",
-  }}
->
-  <div className="container-fluid d-flex align-items-center">
-    <button
-      className="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#navbarNav"
-      aria-controls="navbarNav"
-      aria-expanded={menuOpen}
-      aria-label="Toggle navigation"
-      onClick={handleMenuClick}
+    <nav
+      className="navbar navbar-expand-lg navbar-dark fixed-top"
       style={{
-        height: "50px", // Adjusted height for the toggler button
+        ...navbarStyle,
+        height: "80px",
+        display: "flex",
+        alignItems: "center",
       }}
     >
-      <span className="navbar-toggler-icon"></span>
-    </button>
+      <div className="container-fluid d-flex align-items-center">
+      <button
+  className="navbar-toggler"
+  type="button"
+  data-bs-toggle="collapse"
+  data-bs-target="#navbarNav"
+  aria-controls="navbarNav"
+  aria-expanded={menuOpen}
+  aria-label="Toggle navigation"
+  onClick={handleMenuClick}
+>
+  <span className={`navbar-toggler-icon ${menuOpen ? "close-icon" : ""}`} />
+</button>
 
-    <div
-      className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`}
-      id="navbarNav"
-    >
-      <ul
-        className="navbar-nav mx-auto text-center"
-        style={{
-          listStyle: "none",
-          padding: 0,
-          margin: 0,
-        }}
-      >
-        <li className="nav-item">
-          <Link
-            to="/"
-            className="nav-link text-white"
-            style={{
-              fontSize: "18px", // Larger font size for links
-              padding: "0 15px", // Spacing between links
-            }}
-            onClick={handleLinkClick}
-          >
-            Home
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/aboutMe"
-            className="nav-link text-white"
-            style={{
-              fontSize: "18px",
-              padding: "0 15px",
-            }}
-            onClick={handleLinkClick}
-          >
-            About Me
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/contact"
-            className="nav-link text-white"
-            style={{
-              fontSize: "18px",
-              padding: "0 15px",
-            }}
-            onClick={handleLinkClick}
-          >
-            Contact
-          </Link>
-        </li>
-        <li className="nav-item">
-          <Link
-            to="/pictures"
-            className="nav-link text-white"
-            style={{
-              fontSize: "18px",
-              padding: "0 15px",
-            }}
-            onClick={handleLinkClick}
-          >
-            Pictures
-          </Link>
-        </li>
-        {isAdmin && (
-          <li className="nav-item">
-            <span
-              className="nav-link"
-              style={{
-                cursor: "pointer",
-                color: "red",
-                fontSize: "18px", // Larger font size for logout
-                padding: "0 15px",
-              }}
-              onClick={handleLogout}
-            >
-              Logout
-            </span>
-          </li>
-        )}
-      </ul>
-    </div>
-  </div>
-</nav>
 
-    </>
+
+        <div className={`collapse navbar-collapse ${menuOpen ? "show" : ""}`} id="navbarNav">
+
+
+  <ul
+    className="navbar-nav mx-auto text-center"
+    style={{ listStyle: "none", padding: 0, margin: 0 }}
+  >
+    <li className="nav-item">
+      <Link to="/" className="nav-link text-white" style={{ fontSize: "18px", padding: "0 15px" }} onClick={handleLinkClick}>
+        Home
+      </Link>
+    </li>
+    <li className="nav-item">
+      <Link to="/aboutMe" className="nav-link text-white" style={{ fontSize: "18px", padding: "0 15px" }} onClick={handleLinkClick}>
+        About Me
+      </Link>
+    </li>
+    <li className="nav-item">
+      <Link to="/contact" className="nav-link text-white" style={{ fontSize: "18px", padding: "0 15px" }} onClick={handleLinkClick}>
+        Contact
+      </Link>
+    </li>
+    <li className="nav-item">
+      <Link to="/pictures" className="nav-link text-white" style={{ fontSize: "18px", padding: "0 15px" }} onClick={handleLinkClick}>
+        Pictures
+      </Link>
+    </li>
+    {isAdmin && (
+      <li className="nav-item">
+        <span className="nav-link" style={{ cursor: "pointer", color: "red", fontSize: "18px", padding: "0 15px" }} onClick={handleLogout}>
+          Logout
+        </span>
+      </li>
+    )}
+  </ul>
+</div>
+
+      </div>
+    </nav>
   );
 };
 

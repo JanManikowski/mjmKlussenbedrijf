@@ -6,9 +6,16 @@ import {
   where,
   getDocs,
   addDoc,
+  deleteDoc,
+  doc,
   serverTimestamp,
 } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject,
+} from "firebase/storage";
 import { db, storage } from "../firebase";
 
 const CategoryPage = () => {
@@ -16,11 +23,12 @@ const CategoryPage = () => {
   const [images, setImages] = useState([]);
   const [categoryName, setCategoryName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Track login status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     const fetchCategoryData = async () => {
       try {
+        // Get the category details using its document ID
         const categoryQuery = query(
           collection(db, "categories"),
           where("__name__", "==", categoryId)
@@ -29,6 +37,7 @@ const CategoryPage = () => {
         const category = categorySnapshot.docs[0]?.data();
         setCategoryName(category?.name || "Unknown Category");
 
+        // Get all images for this category
         const imageQuery = query(
           collection(db, "images"),
           where("categoryId", "==", categoryId)
@@ -38,7 +47,6 @@ const CategoryPage = () => {
           id: doc.id,
           ...doc.data(),
         }));
-
         setImages(imagesData);
       } catch (error) {
         console.error("Error fetching category data:", error);
@@ -46,8 +54,6 @@ const CategoryPage = () => {
     };
 
     fetchCategoryData();
-
-    // Check login status (use actual logic for authentication)
     const adminStatus = localStorage.getItem("isAdmin") === "true";
     setIsLoggedIn(adminStatus);
   }, [categoryId]);
@@ -57,7 +63,6 @@ const CategoryPage = () => {
       alert("Please select files to upload.");
       return;
     }
-
     setIsUploading(true);
 
     const uploadPromises = Array.from(files).map(async (file) => {
@@ -74,7 +79,6 @@ const CategoryPage = () => {
       });
 
       const dimensions = await loadPromise;
-
       const storageRef = ref(storage, `images/${categoryId}/${file.name}`);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -91,6 +95,7 @@ const CategoryPage = () => {
                 url: downloadURL,
                 width: dimensions.width,
                 height: dimensions.height,
+                fileName: file.name,
                 timestamp: serverTimestamp(),
               });
               resolve();
@@ -113,11 +118,41 @@ const CategoryPage = () => {
     }
   };
 
+  const handleDeleteImage = async (image) => {
+    if (!window.confirm("Are you sure you want to delete this image?")) return;
+    try {
+      // Delete Firestore document
+      await deleteDoc(doc(db, "images", image.id));
+
+      // Determine fileName: if missing, extract it from the URL
+      let fileName = image.fileName;
+      if (!fileName) {
+        const decodedUrl = decodeURIComponent(image.url);
+        const parts = decodedUrl.split("/");
+        const lastPart = parts[parts.length - 1];
+        fileName = lastPart.split("?")[0];
+      }
+
+      if (fileName) {
+        const imageRef = ref(storage, `images/${categoryId}/${fileName}`);
+        await deleteObject(imageRef);
+        console.log(`Deleted from storage: ${fileName}`);
+      } else {
+        console.warn("Unable to determine fileName, skipping storage deletion.");
+      }
+      alert("Image deleted successfully!");
+      window.location.reload();
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      alert("Failed to delete image. Check console for details.");
+    }
+  };
+
   return (
     <div
       className="container-fluid text-white mt-5"
       style={{
-        backgroundColor: "#0A060D", // Matches the dark theme
+        backgroundColor: "#0A060D",
         minHeight: "100vh",
         paddingTop: "40px",
       }}
@@ -129,7 +164,7 @@ const CategoryPage = () => {
         {categoryName} Images
       </h1>
 
-      {isLoggedIn && ( // Show upload section only if logged in
+      {isLoggedIn && (
         <div className="mb-4 text-center">
           <label htmlFor="fileInput" className="form-label">
             <strong>Upload Images</strong>
@@ -141,7 +176,7 @@ const CategoryPage = () => {
             multiple
             onChange={(e) => handleFilesUpload(e.target.files)}
             style={{
-              backgroundColor: "#1a1a1a", // Dark background for input
+              backgroundColor: "#1a1a1a",
               color: "#f1f1f1",
               border: "1px solid #555",
             }}
@@ -154,40 +189,56 @@ const CategoryPage = () => {
         </div>
       )}
 
-      <div
-        className="gallery-container"
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
-          gap: "10px", 
-          gridAutoFlow: "dense", 
-          padding: "2rem",
-        }}
-      >
-        {images.map((image) => (
-          <div
-            key={image.id}
-            style={{
-              position: "relative",
-              overflow: "hidden",
-              borderRadius: "10px",
-              gridRowEnd: `span ${Math.ceil(
-                (image.height / image.width) * 2
-              )}`, // Adjust row span for taller images
-              border: "2px solid #333", // Subtle border for images
-            }}
-          >
-            <img
-              src={image.url}
-              alt="Category"
+      {/* Wrap the gallery in a container with a larger maxWidth */}
+      <div style={{ maxWidth: "70%", margin: "0 auto" }}>
+        <div
+          className="gallery-container"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(200px, 1fr))",
+            gap: "10px",
+            gridAutoFlow: "dense",
+            padding: "2rem",
+          }}
+        >
+          {images.map((image) => (
+            <div
+              key={image.id}
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                position: "relative",
+                overflow: "hidden",
+                borderRadius: "10px",
+                // Compute gridRowEnd to adjust for image aspect ratio:
+                gridRowEnd: `span ${Math.ceil((image.height / image.width) * 2)}`,
+                border: "2px solid #333",
               }}
-            />
-          </div>
-        ))}
+            >
+              <img
+                src={image.url}
+                alt="Category"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+              {isLoggedIn && (
+                <button
+                  onClick={() => handleDeleteImage(image)}
+                  className="btn btn-danger btn-sm"
+                  style={{
+                    position: "absolute",
+                    top: "5px",
+                    right: "5px",
+                    zIndex: 1000,
+                  }}
+                >
+                  Delete
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
